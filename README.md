@@ -10,9 +10,9 @@ Watch your favorite sorting algorithms do what they do best!
 A simple application for the visualization and analysis of various sorting algorithms. Written in python and using the Tkinter library.
 
 ## Features
-1. Initiation of various arrangements of unsorted data, for example permuted, partially permuted or reverse-ordered data.
+1. Initialization of various arrangements of unsorted data, for example permuted, partially permuted or reverse-ordered data.
 
-2. Visualization of the process of sorting the initiated data by various sorting algorithms. Available algorithms are Selection sort, Bubblesort and Quicksort.
+2. Visualization of the process of sorting the initialized data by various sorting algorithms. Available algorithms are Selection sort, Bubblesort and Quicksort.
 
 3. Simple extensibility of other sorting algorithms. Simply implement your sorting algorithm using the `Sorter` class.
 
