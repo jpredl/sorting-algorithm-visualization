@@ -9,16 +9,12 @@ import VisualizationDiagram
 class VisualizationWorker:
 
     def __init__(self, diagram: VisualizationDiagram.VisualizationDiagram, callback_on_no_next_step_available,
-                 callback_on_no_previous_step_available, callback_on_update_comparison_count,
-                 callback_on_update_swap_count, delay=0.25):
+                 callback_on_update_comparison_count, callback_on_update_swap_count, delay=0.25):
         # diagram used for visualization
         self._diagram: VisualizationDiagram.VisualizationDiagram = diagram
 
         # callback executed when no next step is available
         self._callback_on_no_next_step_available = callback_on_no_next_step_available
-
-        # callback executed when no previous step is available
-        self._callback_on_no_previous_step_available = callback_on_no_previous_step_available
 
         # callback executed when a comparison is visualized
         self._callback_on_update_comparison_count = callback_on_update_comparison_count
@@ -89,23 +85,6 @@ class VisualizationWorker:
             # if after this visualization there is no further next step
             if not self._data.next_step_available():
                 self._finish_visualization()
-
-    def visualize_previous_step(self):
-        # visualize previous step if it is available
-        if self._data.previous_step_available():
-            # visualize previous step in separate thread
-            step = self._data.get_previous_steps()
-            self._thread = threading.Thread(target=self._visualize_step,
-                                            args=(step,), daemon=True)
-            self._thread.start()
-
-            # decrement comparison or swap count
-            self.update_comparison_and_swap_count(step, -1)
-
-            # if after this visualization there is no further previous step
-            if not self._data.previous_step_available():
-                self.clean_up_visualization()
-                self._callback_on_no_previous_step_available()
 
     def _visualize_steps(self):
         # visualize steps while there are steps to visualize

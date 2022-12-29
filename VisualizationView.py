@@ -38,6 +38,7 @@ class Settings:
         scale_speed_default_value = 40
         speed_function = lambda x: np.exp(-0.07 * x)
 
+
 class VisualizationView(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -55,20 +56,21 @@ class VisualizationView(tk.Tk):
         self.frame_controls.grid(row=0, column=0, sticky='N')
 
         # sorting bar diagram widget
-        self.diagram: VisualizationDiagram.VisualizationDiagram = VisualizationDiagram.VisualizationDiagram(self, Settings.data_size)
+        self.diagram: VisualizationDiagram.VisualizationDiagram = VisualizationDiagram.VisualizationDiagram(self,
+                                                                                                            Settings.data_size)
         self.diagram.grid(row=0, column=1)
 
         # frame for initialization controls
         self.frame_initialization = ttk.LabelFrame(self.frame_controls, text='Initialization')
-        self.frame_initialization.grid(row=0, column=0, sticky='WE', padx=(3,0), pady=(3,15))
+        self.frame_initialization.grid(row=0, column=0, sticky='WE', padx=(3, 0), pady=(3, 15))
 
         # frame for visualization controls
         self.frame_visualization = ttk.LabelFrame(self.frame_controls, text='Visualization')
-        self.frame_visualization.grid(row=1, column=0, sticky='WE', padx=(3,0), pady=(3,15))
+        self.frame_visualization.grid(row=1, column=0, sticky='WE', padx=(3, 0), pady=(3, 15))
 
         # frame for analysis
         self.frame_analysis = ttk.LabelFrame(master=self.frame_controls, text='Anaylsis')
-        self.frame_analysis.grid(row=2, column=0, sticky='WE', padx=(3,0), pady=(3,3))
+        self.frame_analysis.grid(row=2, column=0, sticky='WE', padx=(3, 0), pady=(3, 3))
 
         # label for choosing initialization algorithm
         self.label_initialization_algorithm = ttk.Label(master=self.frame_initialization, text='Data Initialization:')
@@ -112,7 +114,8 @@ class VisualizationView(tk.Tk):
         self.label_speed.grid(row=0, column=0)
 
         # speed scale current value
-        self.scale_speed_current_value = tk.DoubleVar(master=self.frame_visualization, value=Settings.Speed.scale_speed_default_value)
+        self.scale_speed_current_value = tk.DoubleVar(master=self.frame_visualization,
+                                                      value=Settings.Speed.scale_speed_default_value)
         self.scale_speed_current_value.trace(mode='w', callback=self.on_change_scale_speed)
 
         # speed scale
@@ -132,17 +135,12 @@ class VisualizationView(tk.Tk):
         # stop button
         self.button_pause = ttk.Button(master=self.frame_visualization, text='Stop',
                                        command=self.on_click_button_pause)
-        self.button_pause.grid(row=1, column=1, sticky='WE')
-
-        # previous step button
-        self.button_previous_step = ttk.Button(master=self.frame_visualization, text='Previous Step',
-                                               command=self.on_click_button_previous_step)
-        self.button_previous_step.grid(row=2, column=0, sticky='WE')
+        self.button_pause.grid(row=2, column=0, sticky='WE')
 
         # next step button
         self.button_next_step = ttk.Button(master=self.frame_visualization, text='Next Step',
                                            command=self.on_click_button_next_step)
-        self.button_next_step.grid(row=2, column=1, sticky='WE')
+        self.button_next_step.grid(row=1, column=1, sticky='WE')
 
         # n label
         self.label_n = ttk.Label(master=self.frame_analysis, text=f'Data Size: {Settings.data_size}')
@@ -159,10 +157,10 @@ class VisualizationView(tk.Tk):
         # visualization worker
         self.visualization_worker = VisualizationWorker.VisualizationWorker(self.diagram,
                                                                             callback_on_no_next_step_available=self.on_no_next_step_available,
-                                                                            callback_on_no_previous_step_available=self.on_no_previous_step_available,
                                                                             callback_on_update_comparison_count=self.on_update_comparison_count,
                                                                             callback_on_update_swap_count=self.on_update_swap_count,
-                                                                            delay=Settings.Speed.speed_function(self.scale_speed_current_value.get()))
+                                                                            delay=Settings.Speed.speed_function(
+                                                                                self.scale_speed_current_value.get()))
 
         # initiate
         self.on_click_button_initiate()
@@ -174,22 +172,20 @@ class VisualizationView(tk.Tk):
         self.button_initiate.config(state='normal')
         self.button_start_resume.config(state='normal', text='Start')
         self.button_pause.config(state='disabled')
-        self.button_previous_step.config(state='disabled')
         self.button_next_step.config(state='normal')
 
         # initiate visualization
         self.visualization_worker. \
             initiate_visualization(
             VisualizationData.VisualizationData(initialization_algorithm=Settings.InitializationAlgorithms[
-                                                self.option_menu_initialization_algorithms_current_value.get()],
+                self.option_menu_initialization_algorithms_current_value.get()],
                                                 sorting_algorithm=Settings.SortingAlgorithms[
-                                                self.option_menu_sorting_algorithms_current_value.get()],
+                                                    self.option_menu_sorting_algorithms_current_value.get()],
                                                 n=Settings.data_size))
 
     def on_change_scale_speed(self, *args):
         # set delay of VisualizationWorker
         self.visualization_worker.set_delay(Settings.Speed.speed_function(self.scale_speed_current_value.get()))
-
 
     def on_click_button_start_resume(self):
         # setup gui status
@@ -198,7 +194,6 @@ class VisualizationView(tk.Tk):
         self.button_initiate.config(state='disabled')
         self.button_start_resume.config(state='disabled')
         self.button_pause.config(state='normal')
-        self.button_previous_step.config(state='disabled')
         self.button_next_step.config(state='disabled')
 
         # start visualization
@@ -211,26 +206,14 @@ class VisualizationView(tk.Tk):
         self.button_initiate.config(state='normal')
         self.button_start_resume.config(state='normal', text='Resume')
         self.button_pause.config(state='disabled')
-        self.button_previous_step.config(state='normal')
         self.button_next_step.config(state='normal')
 
         # pause visualization
         self.visualization_worker.pause_visualization()
 
     def on_click_button_next_step(self):
-        # set gui status
-        self.button_previous_step.config(state='normal')
-
         # visualize next step
         self.visualization_worker.visualize_next_step(stepwise=True)
-
-    def on_click_button_previous_step(self):
-        # set gui status
-        self.button_start_resume.config(state='normal')
-        self.button_next_step.config(state='normal')
-
-        # visualize previous step
-        self.visualization_worker.visualize_previous_step()
 
     def on_no_next_step_available(self):
         # setup gui status
@@ -239,11 +222,7 @@ class VisualizationView(tk.Tk):
         self.button_initiate.config(state='normal')
         self.button_start_resume.config(state='disabled', text='Start')
         self.button_pause.config(state='disabled')
-        self.button_previous_step.config(state='normal')
         self.button_next_step.config(state='disabled')
-
-    def on_no_previous_step_available(self):
-        self.button_previous_step.config(state='disabled')
 
     def on_update_swap_count(self, count):
         # display swap count in label
