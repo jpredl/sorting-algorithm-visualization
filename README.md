@@ -2,10 +2,12 @@
 
 Watch your favorite sorting algorithms do what they do best!
 
-<p align="center">
-  <img src="image/quicksort.gif" width="50%" alt="sd"/>
-  <figcaption style="text-align: center;">Visualization of Quicksort</figcaption>
-</p>
+  <p align="center">
+    <img src="image/quicksort.gif" width="50%" alt="Visualization of Quicksort"/>
+  </p>
+  <p align=center>
+  Visualization of Quicksort
+  </p>
 
 ## About
 A simple application for the visualization and analysis of various sorting algorithms. Written in python and using the Tkinter library.
