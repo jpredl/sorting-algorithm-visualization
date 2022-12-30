@@ -1,47 +1,48 @@
+from collections import namedtuple
+from dataclasses import dataclass
+import tkinter
 import tkinter as tk
 
-from dataclasses import dataclass
-from collections import namedtuple
 
 # Settings for VisualizationDiagram widget
 @dataclass
 class Settings:
     # width of slots
-    width_of_slots = 10
+    width_of_slots: int = 10
 
     # separation between slots
-    separation_between_slots = 3
+    separation_between_slots: int = 3
 
     # horizontal margin left
-    horizontal_margin_left = 2
+    horizontal_margin_left: int = 2
 
     # horizontal margin right
-    horizontal_margin_right = 2
+    horizontal_margin_right: int = 2
 
     # vertical margin top
-    vertical_margin_top = 2
+    vertical_margin_top: int = 2
 
     # vertical margin bottom
-    vertical_margin_bottom = 2
+    vertical_margin_bottom: int = 2
 
     # color palette
     @dataclass
     class ColorPalette:
-        background = 'white'
-        slot_space_default_fill = ''
-        slot_space_default_outline = ''
-        slot_space_highlight_fill = 'gray'
-        slot_space_highlight_outline = 'gray'
-        slot_space_swap_fill = 'medium sea green'
-        slot_space_swap_outline = 'medium sea green'
-        slot_head_default_fill = 'black'
-        slot_head_default_outline = 'black'
-        slot_body_default_fill = 'sky blue'
-        slot_body_default_outline = 'sky blue'
-        slot_body_marked_fill = 'orange red'
-        slot_body_marked_outline = 'orange red'
-        focus_rectangle_outline = 'gainsboro'
-        focus_rectangle_fill = 'gainsboro'
+        background: str = 'white'
+        slot_space_default_fill: str = ''
+        slot_space_default_outline: str = ''
+        slot_space_highlight_fill: str = 'gray'
+        slot_space_highlight_outline: str = 'gray'
+        slot_space_swap_fill: str = 'medium sea green'
+        slot_space_swap_outline: str = 'medium sea green'
+        slot_head_default_fill: str = 'black'
+        slot_head_default_outline: str = 'black'
+        slot_body_default_fill: str = 'sky blue'
+        slot_body_default_outline: str = 'sky blue'
+        slot_body_marked_fill: str = 'orange red'
+        slot_body_marked_outline: str = 'orange red'
+        focus_rectangle_outline: str = 'gainsboro'
+        focus_rectangle_fill: str = 'gainsboro'
 
 
 @dataclass
@@ -56,33 +57,41 @@ Point = namedtuple('Point', 'x y')
 
 class VisualizationDiagram(tk.Canvas):
 
-    def __init__(self, master, n):
+    def __init__(self, master: tkinter.Widget, n: int):
         # number of slots
-        self.number_of_slots = n
+        self.number_of_slots: int = n
+
+        # bottom left x slot positions (in cartesian coordinates)
+        self.bottom_left_x_slot_position: int = [i * (Settings.width_of_slots + Settings.separation_between_slots)
+                                            for i in range(self.number_of_slots)]
+
+        # up right x slot positions (in cartesian coordinates)
+        self.up_right_x_slot_position: int = [i * (Settings.width_of_slots + Settings.separation_between_slots) +
+                                         Settings.width_of_slots for i in range(self.number_of_slots)]
 
         # diagram contains n slots
-        self.slots = []
+        self.slots: list[DiagramSlot] = []
 
         # horizontal offset for coordinates
-        self.horizontal_offset = 3
+        self.horizontal_offset: int = 3
 
         # vertical offset for coordinates
-        self.vertical_offset = 2
+        self.vertical_offset: int = 2
 
         # width of widget
-        self.width = Settings.horizontal_margin_left + self.number_of_slots * Settings.width_of_slots +\
+        self.width: int = Settings.horizontal_margin_left + self.number_of_slots * Settings.width_of_slots +\
                      (self.number_of_slots - 1) * Settings.separation_between_slots +\
                      Settings.horizontal_margin_right + 1
 
         # height of widget
-        self.height = Settings.vertical_margin_top + (self.number_of_slots + 2) * Settings.width_of_slots +\
+        self.height: int = Settings.vertical_margin_top + (self.number_of_slots + 2) * Settings.width_of_slots +\
                       Settings.vertical_margin_bottom + 1
 
         # cartesian coordinates of point bottom left
-        self.bottom_left = Point(0, 0)
+        self.bottom_left: Point = Point(0, 0)
 
         # cartesian coordinates of point up right
-        self.up_right = Point(self.width - Settings.horizontal_margin_right - 1,
+        self.up_right: Point = Point(self.width - Settings.horizontal_margin_right - 1,
                               self.height - Settings.vertical_margin_top - Settings.vertical_margin_bottom - 1)
 
         # currently marked slot
@@ -97,25 +106,25 @@ class VisualizationDiagram(tk.Canvas):
         # initiate canvas widget
         tk.Canvas.__init__(self, master=master, width=self.width, height=self.height, background=Settings.ColorPalette.background)
 
-    def convert_cartesian_x_to_canvas_x(self, x):
+    def _convert_cartesian_x_to_canvas_x(self, x: int) -> int:
         return Settings.horizontal_margin_left + self.horizontal_offset + x
 
-    def convert_cartesian_y_to_canvas_y(self, y):
+    def _convert_cartesian_y_to_canvas_y(self, y: int) -> int:
         return self.height - Settings.vertical_margin_bottom + self.vertical_offset - y
 
-    def create_cartesian_rectangle(self, bottom_left: Point, up_right: Point,
-                                   outline: str = 'black', fill: str = ''):
+    def _create_cartesian_rectangle(self, bottom_left: Point, up_right: Point,
+                                    outline: str = 'black', fill: str = '') -> None:
         # create a rectangle using cartesian coordinates
-        return tk.Canvas.create_rectangle(self, self.convert_cartesian_x_to_canvas_x(bottom_left.x),
-                                          self.convert_cartesian_y_to_canvas_y(bottom_left.y),
-                                          self.convert_cartesian_x_to_canvas_x(up_right.x),
-                                          self.convert_cartesian_y_to_canvas_y(up_right.y),
+        return tk.Canvas.create_rectangle(self, self._convert_cartesian_x_to_canvas_x(bottom_left.x),
+                                          self._convert_cartesian_y_to_canvas_y(bottom_left.y),
+                                          self._convert_cartesian_x_to_canvas_x(up_right.x),
+                                          self._convert_cartesian_y_to_canvas_y(up_right.y),
                                           outline=outline, fill=fill)
 
-    def get_cartesian_bottom_left_x_coordinate_of_slot(self, pos):
+    def _get_cartesian_bottom_left_x_coordinate_of_slot(self, pos: int) -> int:
         return pos * Settings.width_of_slots
 
-    def setup_bars(self, heights):
+    def setup_slots(self, heights):
         # clear diagram
         self.slots.clear()
         tk.Canvas.delete(self, 'all')
@@ -127,58 +136,54 @@ class VisualizationDiagram(tk.Canvas):
             self.slots = [DiagramSlot() for _ in range(self.number_of_slots)]
 
             for i in range(self.number_of_slots):
-                # determine cartesian x coordinates
-                bottom_left_x = i * (Settings.width_of_slots + Settings.separation_between_slots)
-                up_right_x = i * (Settings.width_of_slots + Settings.separation_between_slots) + Settings.width_of_slots
-
                 # create space of slot
-                self.slots[i].space = self.create_cartesian_rectangle(
-                    Point(bottom_left_x, (heights[i] + 1) * Settings.width_of_slots),
-                    Point(up_right_x, self.up_right.y),
+                self.slots[i].space = self._create_cartesian_rectangle(
+                    Point(self.bottom_left_x_slot_position[i], (heights[i] + 1) * Settings.width_of_slots),
+                    Point(self.up_right_x_slot_position[i], self.up_right.y),
                     outline=Settings.ColorPalette.slot_space_default_outline,
                     fill=Settings.ColorPalette.slot_space_default_fill)
 
                 # create head of slot
-                self.slots[i].head = self.create_cartesian_rectangle(
-                    Point(bottom_left_x, heights[i] * Settings.width_of_slots),
-                    Point(up_right_x, (heights[i] + 1) * Settings.width_of_slots),
+                self.slots[i].head = self._create_cartesian_rectangle(
+                    Point(self.bottom_left_x_slot_position[i], heights[i] * Settings.width_of_slots),
+                    Point(self.up_right_x_slot_position[i], (heights[i] + 1) * Settings.width_of_slots),
                     outline=Settings.ColorPalette.slot_head_default_outline,
                     fill=Settings.ColorPalette.slot_head_default_fill)
 
                 # create body of slot
-                self.slots[i].body = self.create_cartesian_rectangle(
-                    Point(bottom_left_x, self.bottom_left.y),
-                    Point(up_right_x, heights[i] * Settings.width_of_slots),
+                self.slots[i].body = self._create_cartesian_rectangle(
+                    Point(self.bottom_left_x_slot_position[i], self.bottom_left.y),
+                    Point(self.up_right_x_slot_position[i], heights[i] * Settings.width_of_slots),
                     outline=Settings.ColorPalette.slot_body_default_outline,
                     fill=Settings.ColorPalette.slot_body_default_fill)
+
 
     def swap_slots(self, pos_1, pos_2):
         # if slots are setup
         if len(self.slots):
 
-            # highlight space of slots at position pos_1 and pos_2 for swapping
-            self.highlight_slots(pos_1, pos_2, swap=True)
-
-            # get current bottom left x coordinate of slots (in canvas coordinates)
-            bottom_left_x_pos_1 = tk.Canvas.coords(self, self.slots[pos_1].space)[0]
-            bottom_left_x_pos_2 = tk.Canvas.coords(self, self.slots[pos_2].space)[0]
-
             # swap space of slots on canvas
-            tk.Canvas.move(self, self.slots[pos_1].space, bottom_left_x_pos_2 - bottom_left_x_pos_1, 0)
-            tk.Canvas.move(self, self.slots[pos_2].space, bottom_left_x_pos_1 - bottom_left_x_pos_2, 0)
+            tk.Canvas.move(self, self.slots[pos_1].space, self.bottom_left_x_slot_position[pos_2] -
+                           self.bottom_left_x_slot_position[pos_1], 0)
+            tk.Canvas.move(self, self.slots[pos_2].space, self.bottom_left_x_slot_position[pos_1] -
+                           self.bottom_left_x_slot_position[pos_2], 0)
 
             # swap head of slots on canvas
-            tk.Canvas.move(self, self.slots[pos_1].head, bottom_left_x_pos_2 - bottom_left_x_pos_1, 0)
-            tk.Canvas.move(self, self.slots[pos_2].head, bottom_left_x_pos_1 - bottom_left_x_pos_2, 0)
+            tk.Canvas.move(self, self.slots[pos_1].head, self.bottom_left_x_slot_position[pos_2] -
+                           self.bottom_left_x_slot_position[pos_1], 0)
+            tk.Canvas.move(self, self.slots[pos_2].head, self.bottom_left_x_slot_position[pos_1] -
+                           self.bottom_left_x_slot_position[pos_2], 0)
 
             # swap body of slots on canvas
-            tk.Canvas.move(self, self.slots[pos_1].body, bottom_left_x_pos_2 - bottom_left_x_pos_1, 0)
-            tk.Canvas.move(self, self.slots[pos_2].body, bottom_left_x_pos_1 - bottom_left_x_pos_2, 0)
+            tk.Canvas.move(self, self.slots[pos_1].body, self.bottom_left_x_slot_position[pos_2] -
+                           self.bottom_left_x_slot_position[pos_1], 0)
+            tk.Canvas.move(self, self.slots[pos_2].body, self.bottom_left_x_slot_position[pos_1] -
+                           self.bottom_left_x_slot_position[pos_2], 0)
 
             # swap slots in list of slots
-            temp = self.slots[pos_2]
-            self.slots[pos_2] = self.slots[pos_1]
-            self.slots[pos_1] = temp
+            temp = self.slots[pos_1]
+            self.slots[pos_1] = self.slots[pos_2]
+            self.slots[pos_2] = temp
 
     def highlight_slots(self, pos_1, pos_2, swap=False):
         # if slots are setup
@@ -255,9 +260,9 @@ class VisualizationDiagram(tk.Canvas):
 
             # create focus rectangle at positions from pos_from to pos_to
             self.focus_rectangle = tk.Canvas.create_rectangle(self, bottom_left_x,
-                                                              self.convert_cartesian_y_to_canvas_y(self.bottom_left.y),
+                                                              self._convert_cartesian_y_to_canvas_y(self.bottom_left.y),
                                                               up_right_x,
-                                                              self.convert_cartesian_y_to_canvas_y(self.up_right.y),
+                                                              self._convert_cartesian_y_to_canvas_y(self.up_right.y),
                                                               outline=Settings.ColorPalette.focus_rectangle_outline,
                                                               fill=Settings.ColorPalette.focus_rectangle_fill)
 

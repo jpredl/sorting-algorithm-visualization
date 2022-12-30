@@ -1,41 +1,43 @@
+from dataclasses import dataclass
+import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
-from dataclasses import dataclass
 
-import numpy as np
-
-import Algorithms
-import VisualizationDiagram
+import Initiator
+import Sorter
 import VisualizationData
+import VisualizationDiagram
 import VisualizationWorker
 
 
 @dataclass
 class Settings:
     # title of the window
-    title = 'Sorting Algorithm Visualization'
+    title: str = 'Sorting Algorithm Visualization'
 
     # size of data
-    data_size = 50
+    data_size: int = 50
 
     # algorithms for initializing the data
-    InitializationAlgorithms = {'Permutation': Algorithms.PermutationInitiator.initiate,
-                                'Local': Algorithms.LocalInitiator.initiate,
-                                'Transposition': Algorithms.TranspositionInitiater.initiate,
-                                'Reverse': Algorithms.ReverseInitiator.initiate,
-                                'Sorted': Algorithms.SortedInitiator.initiate}
+    InitializationAlgorithms = {'Permutation': Initiator.PermutationInitiator.initiate,
+                                'Local': Initiator.LocalInitiator.initiate,
+                                'Transposition': Initiator.TranspositionInitiater.initiate,
+                                'Reverse': Initiator.ReverseInitiator.initiate,
+                                'Sorted': Initiator.SortedInitiator.initiate}
 
     # algorithms for sorting the data
-    SortingAlgorithms = {'Selectionsort': Algorithms.SelectionSorter.sort,
-                         'Bubblesort': Algorithms.BubbleSorter.sort,
-                         'Quicksort': Algorithms.Quicksorter.sort}
+    SortingAlgorithms = {'Selectionsort': Sorter.SelectionSorter.sort,
+                         'Insertionsort': Sorter.InsertionSorter.sort,
+                         'Shellsort': Sorter.ShellSorter.sort,
+                         'Bubblesort': Sorter.BubbleSorter.sort,
+                         'Quicksort': Sorter.QuickSorter.sort}
 
     # settings for visualization speed
     @dataclass
     class Speed:
-        scale_speed_from = 0
-        scale_speed_to = 100
-        scale_speed_default_value = 40
+        scale_speed_from: int = 0
+        scale_speed_to: int = 100
+        scale_speed_default_value: int = 40
         speed_function = lambda x: np.exp(-0.07 * x)
 
 
@@ -56,8 +58,8 @@ class VisualizationView(tk.Tk):
         self.frame_controls.grid(row=0, column=0, sticky='N')
 
         # sorting bar diagram widget
-        self.diagram: VisualizationDiagram.VisualizationDiagram = VisualizationDiagram.VisualizationDiagram(self,
-                                                                                                            Settings.data_size)
+        self.diagram: VisualizationDiagram.VisualizationDiagram =\
+            VisualizationDiagram.VisualizationDiagram(self, Settings.data_size)
         self.diagram.grid(row=0, column=1)
 
         # frame for initialization controls
@@ -85,7 +87,7 @@ class VisualizationView(tk.Tk):
                                                                     self.option_menu_initialization_algorithms_current_value,
                                                                     self.option_menu_initialization_algorithms_current_value.get(),
                                                                     *list(Settings.InitializationAlgorithms.keys()),
-                                                                    command=self.on_click_button_initiate)
+                                                                    command=self._on_click_button_initiate)
         self.option_menu_initialization_algorithms.grid(row=0, column=1, sticky='WE')
 
         # label for choosing sorting algorithm
@@ -101,12 +103,12 @@ class VisualizationView(tk.Tk):
                                                              self.option_menu_sorting_algorithms_current_value,
                                                              self.option_menu_sorting_algorithms_current_value.get(),
                                                              *list(Settings.SortingAlgorithms.keys()),
-                                                             command=self.on_click_button_initiate)
+                                                             command=self._on_click_button_initiate)
         self.option_menu_sorting_algorithms.grid(row=1, column=1, sticky='WE')
 
         # initiate button
         self.button_initiate = ttk.Button(master=self.frame_initialization, text='Initiate',
-                                          command=self.on_click_button_initiate)
+                                          command=self._on_click_button_initiate)
         self.button_initiate.grid(row=2, column=1, sticky='WE')
 
         # label for speed scale
@@ -116,7 +118,7 @@ class VisualizationView(tk.Tk):
         # speed scale current value
         self.scale_speed_current_value = tk.DoubleVar(master=self.frame_visualization,
                                                       value=Settings.Speed.scale_speed_default_value)
-        self.scale_speed_current_value.trace(mode='w', callback=self.on_change_scale_speed)
+        self.scale_speed_current_value.trace(mode='w', callback=self._on_change_scale_speed)
 
         # speed scale
         self.scale_speed = ttk.Scale(master=self.frame_visualization,
@@ -129,17 +131,17 @@ class VisualizationView(tk.Tk):
 
         # start button
         self.button_start_resume = ttk.Button(master=self.frame_visualization, text='Start',
-                                              command=self.on_click_button_start_resume)
+                                              command=self._on_click_button_start_resume)
         self.button_start_resume.grid(row=1, column=0, sticky='WE')
 
         # stop button
         self.button_pause = ttk.Button(master=self.frame_visualization, text='Stop',
-                                       command=self.on_click_button_pause)
+                                       command=self._on_click_button_pause)
         self.button_pause.grid(row=2, column=0, sticky='WE')
 
         # next step button
         self.button_next_step = ttk.Button(master=self.frame_visualization, text='Next Step',
-                                           command=self.on_click_button_next_step)
+                                           command=self._on_click_button_next_step)
         self.button_next_step.grid(row=1, column=1, sticky='WE')
 
         # n label
@@ -156,16 +158,16 @@ class VisualizationView(tk.Tk):
 
         # visualization worker
         self.visualization_worker = VisualizationWorker.VisualizationWorker(self.diagram,
-                                                                            callback_on_no_next_step_available=self.on_no_next_step_available,
-                                                                            callback_on_update_comparison_count=self.on_update_comparison_count,
-                                                                            callback_on_update_swap_count=self.on_update_swap_count,
+                                                                            callback_on_no_next_step_available=self._on_no_next_step_available,
+                                                                            callback_on_update_comparison_count=self._on_update_comparison_count,
+                                                                            callback_on_update_swap_count=self._on_update_swap_count,
                                                                             delay=Settings.Speed.speed_function(
                                                                                 self.scale_speed_current_value.get()))
 
         # initiate
-        self.on_click_button_initiate()
+        self._on_click_button_initiate()
 
-    def on_click_button_initiate(self, *args):
+    def _on_click_button_initiate(self, *args) -> None:
         # set gui status
         self.option_menu_initialization_algorithms.config(state='normal')
         self.option_menu_sorting_algorithms.config(state='normal')
@@ -183,11 +185,11 @@ class VisualizationView(tk.Tk):
                                                     self.option_menu_sorting_algorithms_current_value.get()],
                                                 n=Settings.data_size))
 
-    def on_change_scale_speed(self, *args):
+    def _on_change_scale_speed(self, *args) -> None:
         # set delay of VisualizationWorker
         self.visualization_worker.set_delay(Settings.Speed.speed_function(self.scale_speed_current_value.get()))
 
-    def on_click_button_start_resume(self):
+    def _on_click_button_start_resume(self) -> None:
         # setup gui status
         self.option_menu_initialization_algorithms.config(state='disabled')
         self.option_menu_sorting_algorithms.config(state='disabled')
@@ -199,7 +201,7 @@ class VisualizationView(tk.Tk):
         # start visualization
         self.visualization_worker.start_visualization()
 
-    def on_click_button_pause(self):
+    def _on_click_button_pause(self) -> None:
         # setup gui status
         self.option_menu_initialization_algorithms.config(state='normal')
         self.option_menu_sorting_algorithms.config(state='normal')
@@ -211,11 +213,11 @@ class VisualizationView(tk.Tk):
         # pause visualization
         self.visualization_worker.pause_visualization()
 
-    def on_click_button_next_step(self):
+    def _on_click_button_next_step(self) -> None:
         # visualize next step
-        self.visualization_worker.visualize_next_step(stepwise=True)
+        self.visualization_worker.visualize_next_step()
 
-    def on_no_next_step_available(self):
+    def _on_no_next_step_available(self) -> None:
         # setup gui status
         self.option_menu_initialization_algorithms.config(state='normal')
         self.option_menu_sorting_algorithms.config(state='normal')
@@ -224,10 +226,10 @@ class VisualizationView(tk.Tk):
         self.button_pause.config(state='disabled')
         self.button_next_step.config(state='disabled')
 
-    def on_update_swap_count(self, count):
+    def _on_update_swap_count(self, count: int) -> None:
         # display swap count in label
         self.label_swap_count.config(text=f'Swaps: {count}')
 
-    def on_update_comparison_count(self, count):
+    def _on_update_comparison_count(self, count: int) -> None:
         # display comparison count in label
         self.label_comparison_count.config(text=f'Comparisons: {count}')

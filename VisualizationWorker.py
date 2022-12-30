@@ -1,7 +1,7 @@
-import threading
 import time
+import threading
 
-import Algorithms
+import Sorter
 import VisualizationData
 import VisualizationDiagram
 
@@ -9,7 +9,7 @@ import VisualizationDiagram
 class VisualizationWorker:
 
     def __init__(self, diagram: VisualizationDiagram.VisualizationDiagram, callback_on_no_next_step_available,
-                 callback_on_update_comparison_count, callback_on_update_swap_count, delay=0.25):
+                 callback_on_update_comparison_count, callback_on_update_swap_count, delay: float):
         # diagram used for visualization
         self._diagram: VisualizationDiagram.VisualizationDiagram = diagram
 
@@ -23,22 +23,22 @@ class VisualizationWorker:
         self._callback_on_update_swap_count = callback_on_update_swap_count
 
         # delay for visualization
-        self._delay = delay
+        self._delay: float = delay
 
         # thread for visualization
-        self._thread = None
+        self._thread: threading.Thread = None
 
         # data to be visualized
         self._data: VisualizationData.VisualizationData = None
 
         # comparisons visualized count
-        self._comparison_count = 0
+        self._comparison_count: int = 0
 
         # swaps visualized count
-        self._swap_count = 0
+        self._swap_count: int = 0
 
         # interrupt to stop thread
-        self._stop_thread = False
+        self._stop_thread: bool = False
 
     def initiate_visualization(self, data: VisualizationData.VisualizationData):
         # setup data
@@ -53,7 +53,7 @@ class VisualizationWorker:
         self._callback_on_update_swap_count(self._swap_count)
 
         # setup bars in diagram
-        self._diagram.setup_bars(self._data.initial_data)
+        self._diagram.setup_slots(self._data.initial_data)
 
     def start_visualization(self):
         # if there are steps to visualize
@@ -67,24 +67,20 @@ class VisualizationWorker:
         # set interrupt of thread
         self._stop_thread = True
 
-    def visualize_next_step(self, stepwise):
+    def visualize_next_step(self):
         # visualize next step if it is available
         if self._data.next_step_available():
-            # if stepwise is true visualize next step in separate thread
-            step = self._data.get_next_step()
-            if stepwise:
-                self._thread = threading.Thread(target=self._visualize_step,
-                                                args=(step,), daemon=True)
-                self._thread.start()
-            else:
-                self._visualize_step(step)
-
-            # increment comparison or swap count
-            self.update_comparison_and_swap_count(step, 1)
+            # visualize next step in separate thread
+            self._thread = threading.Thread(target=self._visualize_step,
+                                            args=(self._data.get_next_step(),), daemon=True)
+            self._thread.start()
 
             # if after this visualization there is no further next step
             if not self._data.next_step_available():
                 self._finish_visualization()
+
+    def set_delay(self, delay: float) -> None:
+        self._delay = delay
 
     def _visualize_steps(self):
         # visualize steps while there are steps to visualize
@@ -93,52 +89,56 @@ class VisualizationWorker:
             if self._stop_thread:
                 break
 
-            # visualize next step
-            self.visualize_next_step(stepwise=False)
+            # visualize next step and wait
+            if self._visualize_step(self._data.get_next_step()):
+                time.sleep(self._delay)
 
-            # delay between steps
-            time.sleep(self._delay)
+        # if after this visualization there is no further next step
+        if not self._data.next_step_available():
+            self._finish_visualization()
 
-    def _visualize_step(self, step):
+    def _visualize_step(self, step: Sorter.Step) -> bool:
         # handle step
         match type(step):
-            case Algorithms.Comparison:
+
+            case Sorter.Comparison:
                 self._diagram.highlight_slots(step.pos_1, step.pos_2)
-            case Algorithms.Swap:
-                self._diagram.swap_slots(step.pos_1, step.pos_2)
-            case Algorithms.Mark:
-                self._diagram.mark_slot(step.pos)
-            case Algorithms.Focus:
-                self._diagram.focus_slots(step.pos_1, step.pos_2)
 
-    def _finish_visualization(self):
-        # clean up visualization
-        self.clean_up_visualization()
-
-        # execute callback for no next step available
-        self._callback_on_no_next_step_available()
-
-    def clean_up_visualization(self):
-        self._diagram.unhighlight_slots()
-        self._diagram.unmark_slot()
-        self._diagram.unfocus_slots()
-
-    def update_comparison_and_swap_count(self, step, increment: int):
-        # handle step
-        match type(step):
-            case Algorithms.Comparison:
-                # decrement comparison count
-                self._comparison_count += increment
+                # increment comparison count
+                self._comparison_count += 1
 
                 # execute callback for comparison count
                 self._callback_on_update_comparison_count(self._comparison_count)
 
-            case Algorithms.Swap:
-                # update swap count
-                self._swap_count += increment
+            case Sorter.Swap:
+                self._diagram.highlight_slots(step.pos_1, step.pos_2, swap=True)
+                self._diagram.swap_slots(step.pos_1, step.pos_2)
+
+                # increment swap count
+                self._swap_count += 1
 
                 # execute callback for swap count
                 self._callback_on_update_swap_count(self._swap_count)
 
-    def set_delay(self, delay):
-        self._delay = delay
+            case Sorter.Mark:
+                self._diagram.mark_slot(step.pos)
+
+            case Sorter.Unmark:
+                self._diagram.unmark_slot()
+
+            case Sorter.Focus:
+                self._diagram.focus_slots(step.pos_1, step.pos_2)
+
+        return step.delay
+
+    def _finish_visualization(self):
+        # clean up visualization
+        self._clean_up_visualization()
+
+        # execute callback for no next step available
+        self._callback_on_no_next_step_available()
+
+    def _clean_up_visualization(self):
+        self._diagram.unhighlight_slots()
+        self._diagram.unmark_slot()
+        self._diagram.unfocus_slots()
