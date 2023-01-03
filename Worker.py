@@ -1,17 +1,17 @@
 import time
 import threading
 
-import Sorter
-import VisualizationData
-import VisualizationDiagram
+import Data
+import Diagram
+import SortingSteps
 
 
-class VisualizationWorker:
+class Worker:
 
-    def __init__(self, diagram: VisualizationDiagram.VisualizationDiagram, callback_on_no_next_step_available,
+    def __init__(self, diagram: Diagram.Diagram, callback_on_no_next_step_available,
                  callback_on_update_comparison_count, callback_on_update_swap_count, delay: float):
         # diagram used for visualization
-        self._diagram: VisualizationDiagram.VisualizationDiagram = diagram
+        self._diagram: Diagram.Diagram = diagram
 
         # callback executed when no next step is available
         self._callback_on_no_next_step_available = callback_on_no_next_step_available
@@ -29,7 +29,7 @@ class VisualizationWorker:
         self._thread: threading.Thread = None
 
         # data to be visualized
-        self._data: VisualizationData.VisualizationData = None
+        self._data: Data.Data = None
 
         # comparisons visualized count
         self._comparison_count: int = 0
@@ -40,7 +40,7 @@ class VisualizationWorker:
         # interrupt to stop thread
         self._stop_thread: bool = False
 
-    def initiate_visualization(self, data: VisualizationData.VisualizationData):
+    def initiate_visualization(self, data: Data.Data):
         # setup data
         self._data = data
         self._comparison_count = 0
@@ -53,7 +53,7 @@ class VisualizationWorker:
         self._callback_on_update_swap_count(self._swap_count)
 
         # setup bars in diagram
-        self._diagram.setup_slots(self._data.initial_data)
+        self._diagram.create_slots(self._data.initial_data)
 
     def start_visualization(self):
         # if there are steps to visualize
@@ -97,12 +97,13 @@ class VisualizationWorker:
         if not self._data.next_step_available():
             self._finish_visualization()
 
-    def _visualize_step(self, step: Sorter.Step) -> bool:
+    def _visualize_step(self, step: SortingSteps.Step) -> bool:
         # handle step
         match type(step):
 
-            case Sorter.Comparison:
-                self._diagram.highlight_slots(step.pos_1, step.pos_2)
+            case SortingSteps.Comparison:
+                # visualize comparison
+                self._diagram.compare_slots(step)
 
                 # increment comparison count
                 self._comparison_count += 1
@@ -110,9 +111,9 @@ class VisualizationWorker:
                 # execute callback for comparison count
                 self._callback_on_update_comparison_count(self._comparison_count)
 
-            case Sorter.Swap:
-                self._diagram.highlight_slots(step.pos_1, step.pos_2, swap=True)
-                self._diagram.swap_slots(step.pos_1, step.pos_2)
+            case SortingSteps.Swap:
+                # visualize swap
+                self._diagram.swap_slots(step)
 
                 # increment swap count
                 self._swap_count += 1
@@ -120,25 +121,27 @@ class VisualizationWorker:
                 # execute callback for swap count
                 self._callback_on_update_swap_count(self._swap_count)
 
-            case Sorter.Mark:
-                self._diagram.mark_slot(step.pos)
+            case SortingSteps.Mark:
+                # visualize mark
+                self._diagram.mark_slot(step)
 
-            case Sorter.Unmark:
-                self._diagram.unmark_slot()
+            case SortingSteps.Unmark:
+                # visualize unmark
+                self._diagram.unmark_slots()
 
-            case Sorter.Focus:
-                self._diagram.focus_slots(step.pos_1, step.pos_2)
+            case SortingSteps.Focus:
+                # visualize focus
+                self._diagram.focus_slots(step)
+
+            case SortingSteps.Unfocus:
+                # visualize unfocus
+                self._diagram.unfocus_slots()
 
         return step.delay
 
     def _finish_visualization(self):
         # clean up visualization
-        self._clean_up_visualization()
+        self._diagram.clean_slots()
 
         # execute callback for no next step available
         self._callback_on_no_next_step_available()
-
-    def _clean_up_visualization(self):
-        self._diagram.unhighlight_slots()
-        self._diagram.unmark_slot()
-        self._diagram.unfocus_slots()

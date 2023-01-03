@@ -1,7 +1,7 @@
-import VisualizationView
+import View
 
 
 if __name__ == '__main__':
-    window = VisualizationView.VisualizationView()
+    window = View.View()
     window.mainloop()
 

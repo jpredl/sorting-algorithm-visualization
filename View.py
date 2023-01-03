@@ -3,11 +3,11 @@ import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 
+import Data
+import Diagram
 import Initiator
-import Sorter
-import VisualizationData
-import VisualizationDiagram
-import VisualizationWorker
+import SortingAlgorithms
+import Worker
 
 
 @dataclass
@@ -26,11 +26,11 @@ class Settings:
                                 'Sorted': Initiator.SortedInitiator.initiate}
 
     # algorithms for sorting the data
-    SortingAlgorithms = {'Selectionsort': Sorter.SelectionSorter.sort,
-                         'Insertionsort': Sorter.InsertionSorter.sort,
-                         'Shellsort': Sorter.ShellSorter.sort,
-                         'Bubblesort': Sorter.BubbleSorter.sort,
-                         'Quicksort': Sorter.QuickSorter.sort}
+    SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter.sort,
+                         'Insertionsort': SortingAlgorithms.InsertionSorter.sort,
+                         'Shellsort': SortingAlgorithms.ShellSorter.sort,
+                         'Bubblesort': SortingAlgorithms.BubbleSorter.sort,
+                         'Quicksort': SortingAlgorithms.QuickSorter.sort}
 
     # settings for visualization speed
     @dataclass
@@ -41,7 +41,7 @@ class Settings:
         speed_function = lambda x: np.exp(-0.07 * x)
 
 
-class VisualizationView(tk.Tk):
+class View(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         # initiate Tk window
@@ -58,8 +58,7 @@ class VisualizationView(tk.Tk):
         self.frame_controls.grid(row=0, column=0, sticky='N')
 
         # sorting bar diagram widget
-        self.diagram: VisualizationDiagram.VisualizationDiagram =\
-            VisualizationDiagram.VisualizationDiagram(self, Settings.data_size)
+        self.diagram: Diagram.Diagram = Diagram.Diagram(self, Settings.data_size)
         self.diagram.grid(row=0, column=1)
 
         # frame for initialization controls
@@ -157,12 +156,12 @@ class VisualizationView(tk.Tk):
         self.label_swap_count.grid(row=2, column=0, sticky='W')
 
         # visualization worker
-        self.visualization_worker = VisualizationWorker.VisualizationWorker(self.diagram,
-                                                                            callback_on_no_next_step_available=self._on_no_next_step_available,
-                                                                            callback_on_update_comparison_count=self._on_update_comparison_count,
-                                                                            callback_on_update_swap_count=self._on_update_swap_count,
-                                                                            delay=Settings.Speed.speed_function(
-                                                                                self.scale_speed_current_value.get()))
+        self.visualization_worker = Worker.Worker(self.diagram,
+                                                  callback_on_no_next_step_available=self._on_no_next_step_available,
+                                                  callback_on_update_comparison_count=self._on_update_comparison_count,
+                                                  callback_on_update_swap_count=self._on_update_swap_count,
+                                                  delay=Settings.Speed.speed_function(
+                                                      self.scale_speed_current_value.get()))
 
         # initiate
         self._on_click_button_initiate()
@@ -177,13 +176,12 @@ class VisualizationView(tk.Tk):
         self.button_next_step.config(state='normal')
 
         # initiate visualization
-        self.visualization_worker. \
-            initiate_visualization(
-            VisualizationData.VisualizationData(initialization_algorithm=Settings.InitializationAlgorithms[
+        self.visualization_worker.initiate_visualization(
+            Data.Data(initialization_algorithm=Settings.InitializationAlgorithms[
                 self.option_menu_initialization_algorithms_current_value.get()],
-                                                sorting_algorithm=Settings.SortingAlgorithms[
-                                                    self.option_menu_sorting_algorithms_current_value.get()],
-                                                n=Settings.data_size))
+                      sorting_algorithm=Settings.SortingAlgorithms[
+                          self.option_menu_sorting_algorithms_current_value.get()],
+                      n=Settings.data_size))
 
     def _on_change_scale_speed(self, *args) -> None:
         # set delay of VisualizationWorker
