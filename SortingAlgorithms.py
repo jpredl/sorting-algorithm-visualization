@@ -5,12 +5,7 @@ from Sorter import Sorter
 
 class SelectionSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
-        # sort data by using selectionsort algorithm
+    def execute(self, data: np.ndarray) -> None:
         n = len(data)
         for i in range(n):
             # determine position min of smallest element in data[i], ..., data[n]
@@ -26,18 +21,10 @@ class SelectionSorter(Sorter):
             # put smallest element to the front of data[i], ..., data[n]
             Sorter.swap(data, i, min)
 
-        # data is sorted now
-        return Sorter.steps
-
 
 class InsertionSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
-        # sort data using the insertion sort algorithm
+    def execute(self, data: np.ndarray) -> None:
         for i in range(1, len(data)):
             # insert data[i] at correct position in data[0], ..., data[i-1]
             Sorter.mark(i, delay=False)
@@ -51,17 +38,10 @@ class InsertionSorter(Sorter):
                 else:
                     break
 
-        # data is sorted now
-        return Sorter.steps
-
 
 class ShellSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
+    def execute(self, data: np.ndarray) -> None:
         # get increments for shellsort
         n = len(data)
         increments = ShellSorter._get_increments(n)
@@ -80,9 +60,6 @@ class ShellSorter(Sorter):
                         j -= k
                     else:
                         break
-
-        # data is sorted now
-        return Sorter.steps
 
     @staticmethod
     def _get_increments(n: int) -> np.ndarray:
@@ -110,12 +87,7 @@ class ShellSorter(Sorter):
 
 class BubbleSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
-        # sort data using the bubblesort algorithm
+    def execute(self, data: np.ndarray) -> None:
         for i in range(len(data) - 1, 0, -1):
             sorted_flag = True
             for j in range(i):
@@ -136,18 +108,10 @@ class BubbleSorter(Sorter):
             if sorted_flag:
                 break
 
-        # data is sorted now
-        return Sorter.steps
-
 
 class ShakerSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
-        # sort data using the shakersort algorithm
+    def execute(self, data: np.ndarray) -> None:
         n = len(data)
         for i in range(1, int(np.floor(n / 2))):
 
@@ -185,18 +149,10 @@ class ShakerSorter(Sorter):
             if sorted_flag:
                 break
 
-        # data is sorted now
-        return Sorter.steps
-
 
 class CombSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
-
-        # sort data using the combsort algorithm
+    def execute(self, data: np.ndarray) -> None:
         n = len(data)
         shrinking_factor = 1.3
         h = n
@@ -212,42 +168,23 @@ class CombSorter(Sorter):
                 j = i + h
                 # if data[i] > data[j]
                 if Sorter.compare(data, j, i):
-                    # mark data entry to visualize bubble rising up
-                    Sorter.mark(i, delay=False)
-
                     Sorter.swap(data, i, j)
                     sorted_flag = False
-                else:
-                    # unmark data entry as bubble is not rising anymore
-                    Sorter.unmark(delay=False)
-
-        # data is sorted now
-        return Sorter.steps
 
 
 class QuickSorter(Sorter):
 
-    @staticmethod
-    def sort(data):
-        # prepare new round of sorting
-        Sorter.steps.clear()
+    def execute(self, data: np.ndarray) -> None:
+        self._quicksort(data, 0, len(data) - 1)
 
-        # sort data by using quicksort algorithm
-        QuickSorter._recursion(data, 0, len(data) - 1)
-
-        # data is sorted now
-        return Sorter.steps
-
-    @staticmethod
-    def _recursion(data, l, r):
+    def _quicksort(self, data: np.ndarray, l: int, r: int) -> None:
 
         if r > l:
-            # select position of pivot element
-            p = r
-
-            # append visualization steps
+            # set focus to subarray data[l], ..., data[r]
             Sorter.focus(l, r)
-            Sorter.mark(p)
+
+            # select position of pivot element
+            p = self._select_pivot_element(data, l, r)
 
             # partition the data into two subarrays
             # - the first containing the elements smaller than the pivot element
@@ -275,6 +212,53 @@ class QuickSorter(Sorter):
             if i < p:
                 Sorter.swap(data, i, p)
             # sort the first subarray
-            QuickSorter._recursion(data, l, i - 1)
+            QuickSorter._quicksort(self, data, l, i - 1)
             # sort the second subarray
-            QuickSorter._recursion(data, i + 1, r)
+            QuickSorter._quicksort(self, data, i + 1, r)
+
+    def _select_pivot_element(self, data: np.ndarray, l: int, r: int) -> int:
+        # select element at position r as pivot element
+        Sorter.mark(r)
+        return r
+
+
+class MedianQuickSorter(QuickSorter):
+
+    def _select_pivot_element(self, data: np.ndarray, l: int, r: int) -> int:
+        # calculate position of element in the middle of l and r
+        m = int((l + r) / 2)
+
+        # visualize
+        Sorter.mark(l)
+        Sorter.mark(m, multiple=True)
+        Sorter.mark(r, multiple=True)
+
+        # determine median of data[l], data[m] and data[r]
+        # if data[l] > data [r]
+        if Sorter.compare(data, r, l):
+            Sorter.swap(data, r, l)
+        # if data[l] > data[m]
+        if Sorter.compare(data, m, l):
+            Sorter.swap(data, m, l)
+        # if data[r] > data[m]
+        if Sorter.compare(data, m, r):
+            Sorter.swap(data, m, r)
+
+        # r is now position of pivot element
+        Sorter.unmark(delay=False)
+        Sorter.mark(r)
+        return r
+
+
+class RandomQuickSorter(QuickSorter):
+
+    def _select_pivot_element(self, data: np.ndarray, l: int, r: int) -> int:
+        # select random element in data[l], ..., data[r]
+        p = np.random.randint(l, r)
+        Sorter.mark(p)
+
+        # place data[p] at the end of data[l], ..., data[r]
+        Sorter.swap(data, p, r)
+
+        # r is now position of random pivot element
+        return r

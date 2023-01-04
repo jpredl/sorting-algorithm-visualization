@@ -15,7 +15,7 @@ A simple application for the visualization and analysis of various sorting algor
 ## Features
 1. Initialization of various arrangements of unsorted data, for example permuted, partially permuted or reverse-ordered data.
 
-2. Visualization of the process of sorting the initialized data by various sorting algorithms. Available algorithms are **Selectionsort**, **Insertionsort**, **Shellsort**, **Bubblesort**, **Shakersort**, **Combsort** and **Quicksort**.
+2. Visualization of the process of sorting the initialized data by various sorting algorithms. Available algorithms are **Selectionsort**, **Insertionsort**, **Shellsort**, **Bubblesort**, **Shakersort**, **Combsort** and **three different variants of Quicksort**.
 
 3. Simple extensibility of other sorting algorithms. Simply implement your sorting algorithm using the `Sorter` class.
 

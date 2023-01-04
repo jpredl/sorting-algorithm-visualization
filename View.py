@@ -26,13 +26,15 @@ class Settings:
                                 'Sorted': Initiator.SortedInitiator.initiate}
 
     # algorithms for sorting the data
-    SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter.sort,
-                         'Insertionsort': SortingAlgorithms.InsertionSorter.sort,
-                         'Shellsort': SortingAlgorithms.ShellSorter.sort,
-                         'Bubblesort': SortingAlgorithms.BubbleSorter.sort,
-                         'Shakersort': SortingAlgorithms.ShakerSorter.sort,
-                         'Combsort': SortingAlgorithms.CombSorter.sort,
-                         'Quicksort': SortingAlgorithms.QuickSorter.sort}
+    SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter().sort,
+                         'Insertionsort': SortingAlgorithms.InsertionSorter().sort,
+                         'Shellsort': SortingAlgorithms.ShellSorter().sort,
+                         'Bubblesort': SortingAlgorithms.BubbleSorter().sort,
+                         'Shakersort': SortingAlgorithms.ShakerSorter().sort,
+                         'Combsort': SortingAlgorithms.CombSorter().sort,
+                         'Quicksort': SortingAlgorithms.QuickSorter().sort,
+                         'Quicksort (Median)': SortingAlgorithms.MedianQuickSorter().sort,
+                         'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter().sort}
 
     # settings for visualization speed
     @dataclass

@@ -6,9 +6,18 @@ import SortingSteps
 class Sorter:
     steps = []
 
-    @staticmethod
-    def sort(data: np.ndarray) -> list[SortingSteps.Step]:
+    def sort(self, data: np.ndarray) -> list[SortingSteps.Step]:
+        # prepare new round of sorting
+        Sorter.steps.clear()
+
+        # sort data
+        self.execute(data)
+
+        # data is sorted now
         return Sorter.steps
+
+    def execute(self, data: np.ndarray) -> None:
+        pass
 
     @staticmethod
     def compare(data: np.ndarray, pos_1: int, pos_2: int, delay: bool = True) -> int:

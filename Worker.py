@@ -53,7 +53,7 @@ class Worker:
         self._callback_on_update_swap_count(self._swap_count)
 
         # setup bars in diagram
-        self._diagram.create_slots(self._data.initial_data)
+        self._diagram.create_slots(self._data.get_initial_data())
 
     def start_visualization(self):
         # if there are steps to visualize
