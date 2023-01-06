@@ -22,6 +22,50 @@ class SelectionSorter(Sorter):
             Sorter.swap(data, i, min)
 
 
+class HeapSorter(Sorter):
+
+    def execute(self, data: np.ndarray) -> None:
+        # heapify data
+        HeapSorter._heapify(data)
+
+        # sort heap
+        for i in range(len(data) - 1, 0, -1):
+            Sorter.swap(data, 0, i)
+            HeapSorter._sift_down(data, 0, i - 1)
+
+    @staticmethod
+    def _heapify(data: np.ndarray) -> None:
+        # transform data into a heap
+        n = len(data)
+        for i in range(int(n/2) - 1, -1, -1):
+            HeapSorter._sift_down(data, i, n - 1)
+
+    @staticmethod
+    def _sift_down(data: np.ndarray, i: int, m: int) -> None:
+        # sift down data[i] up to data[m]
+        Sorter.focus(i, m)
+        Sorter.mark(i)
+        while 2 * i + 1 <= m:
+            # data[i] has left child
+            j = 2 * i + 1
+            # data[j] is left child
+            if j < m:
+                # data[i] has right child (data[j + 1] is right child)
+                # if data[j] < data[j + 1]
+                if Sorter.compare(data, j, j + 1):
+                    j += 1
+                    # now data[j] is greater child
+            # if data[i] < data[j]
+            if Sorter.compare(data, i, j):
+                Sorter.swap(data, i, j)
+                # continue to sift down data[i]
+                i = j
+            else:
+                # done, heap condition is satisfied
+                break
+
+
+
 class InsertionSorter(Sorter):
 
     def execute(self, data: np.ndarray) -> None:
@@ -262,3 +306,4 @@ class RandomQuickSorter(QuickSorter):
 
         # r is now position of random pivot element
         return r
+

@@ -6,11 +6,11 @@ import numpy as np
 import SortingSteps
 
 
-# Settings for Diagram widget
 @dataclass
 class Settings:
+
     # width of slots
-    width_of_slots: int = 10
+    width_of_slots: int = 8
 
     # separation between slots
     separation_between_slots: int = 3
@@ -67,7 +67,8 @@ class Diagram(tk.Canvas):
                            Settings.horizontal_margin_right + 1
 
         # height of widget
-        self._height: int = Settings.vertical_margin_top + (self._number_of_slots + 2) * Settings.width_of_slots + \
+        self._height: int = Settings.vertical_margin_top + (
+                self._number_of_slots + 2) * Settings.width_of_slots + \
                             Settings.vertical_margin_bottom + 1
 
         # initiate canvas widget
@@ -190,13 +191,15 @@ class Diagram(tk.Canvas):
         self._currently_marked_slots.clear()
 
     def focus_slots(self, focus: SortingSteps.Focus) -> None:
-        # unfocus slots
-        self.unfocus_slots()
+        # clean slots
+        self.clean_slots()
 
         # create focus rectangle at positions from from_pos to to_pos
-        self._focus_rectangle = tk.Canvas.create_rectangle(self, self._convert_cartesian_x_to_canvas_x(self._bottom_left_x_slot_position[focus.from_pos]),
+        self._focus_rectangle = tk.Canvas.create_rectangle(self, self._convert_cartesian_x_to_canvas_x(
+            self._bottom_left_x_slot_position[focus.from_pos]),
                                                            self._convert_cartesian_y_to_canvas_y(self._bottom_left.y),
-                                                           self._convert_cartesian_x_to_canvas_x(self._up_right_x_slot_position[focus.to_pos]),
+                                                           self._convert_cartesian_x_to_canvas_x(
+                                                               self._up_right_x_slot_position[focus.to_pos]),
                                                            self._convert_cartesian_y_to_canvas_y(self._up_right.y),
                                                            outline=Settings.ColorPalette.focus_rectangle,
                                                            fill=Settings.ColorPalette.focus_rectangle)

@@ -9,32 +9,29 @@ import Initiator
 import SortingAlgorithms
 import Worker
 
-
 @dataclass
 class Settings:
-    # title of the window
-    title: str = 'Sorting Algorithm Visualization'
+    # algorithms for initializing the data
+    InitializationAlgorithms = {'Permutation': Initiator.PermutationInitiator(),
+                                'Local': Initiator.LocalInitiator(),
+                                'Transposition': Initiator.TranspositionInitiater(),
+                                'Reverse': Initiator.ReverseInitiator(),
+                                'Sorted': Initiator.SortedInitiator()}
+
+    # algorithms for sorting the data
+    SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter(),
+                         'Heapsort': SortingAlgorithms.HeapSorter(),
+                         'Insertionsort': SortingAlgorithms.InsertionSorter(),
+                         'Shellsort': SortingAlgorithms.ShellSorter(),
+                         'Bubblesort': SortingAlgorithms.BubbleSorter(),
+                         'Shakersort': SortingAlgorithms.ShakerSorter(),
+                         'Combsort': SortingAlgorithms.CombSorter(),
+                         'Quicksort': SortingAlgorithms.QuickSorter(),
+                         'Quicksort (Median)': SortingAlgorithms.MedianQuickSorter(),
+                         'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter()}
 
     # size of data
     data_size: int = 50
-
-    # algorithms for initializing the data
-    InitializationAlgorithms = {'Permutation': Initiator.PermutationInitiator.initiate,
-                                'Local': Initiator.LocalInitiator.initiate,
-                                'Transposition': Initiator.TranspositionInitiater.initiate,
-                                'Reverse': Initiator.ReverseInitiator.initiate,
-                                'Sorted': Initiator.SortedInitiator.initiate}
-
-    # algorithms for sorting the data
-    SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter().sort,
-                         'Insertionsort': SortingAlgorithms.InsertionSorter().sort,
-                         'Shellsort': SortingAlgorithms.ShellSorter().sort,
-                         'Bubblesort': SortingAlgorithms.BubbleSorter().sort,
-                         'Shakersort': SortingAlgorithms.ShakerSorter().sort,
-                         'Combsort': SortingAlgorithms.CombSorter().sort,
-                         'Quicksort': SortingAlgorithms.QuickSorter().sort,
-                         'Quicksort (Median)': SortingAlgorithms.MedianQuickSorter().sort,
-                         'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter().sort}
 
     # settings for visualization speed
     @dataclass
@@ -52,7 +49,7 @@ class View(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
 
         # set window title
-        self.title(Settings.title)
+        self.title('Sorting Algorithm Visualization')
 
         # prevent window from being resized
         self.resizable(width=False, height=False)
@@ -181,9 +178,9 @@ class View(tk.Tk):
 
         # initiate visualization
         self.visualization_worker.initiate_visualization(
-            Data.Data(initialization_algorithm=Settings.InitializationAlgorithms[
+            Data.Data(initiator=Settings.InitializationAlgorithms[
                 self.option_menu_initialization_algorithms_current_value.get()],
-                      sorting_algorithm=Settings.SortingAlgorithms[
+                      sorter=Settings.SortingAlgorithms[
                           self.option_menu_sorting_algorithms_current_value.get()],
                       n=Settings.data_size))
 
