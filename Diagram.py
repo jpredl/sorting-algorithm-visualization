@@ -31,11 +31,12 @@ class Settings:
     class ColorPalette:
         background: str = 'white'
         slot_space_default: str = ''
-        slot_space_compare: str = 'gray'
+        slot_space_compare: str = 'gray70'
         slot_space_swap: str = 'medium sea green'
         slot_head_default: str = 'black'
         slot_body_default: str = 'sky blue'
-        slot_body_mark: str = 'orange red'
+        slot_body_mark: str = 'indian red'
+        slot_body_replace: str = 'dark slate blue'
         focus_rectangle: str = 'gainsboro'
 
 
@@ -101,6 +102,9 @@ class Diagram(tk.Canvas):
 
         # currently marked slots
         self._currently_marked_slots: list[DiagramSlot] = []
+
+        # currently replaced slots
+        self._currently_replaced_slots: list[DiagramSlot] = []
 
         # current focus rectangle
         self._focus_rectangle = None
@@ -190,6 +194,51 @@ class Diagram(tk.Canvas):
         # clear list of currently marked slots
         self._currently_marked_slots.clear()
 
+    def replace_slot(self, replace: SortingSteps.Replace):
+        # unreplace slot
+        self.unreplace_slots()
+
+        # uncompare slots
+        self._uncompare_slots()
+
+        # unswap slots
+        self._unswap_slots()
+
+        # replace space of slot
+        tk.Canvas.delete(self, self._slots[replace.pos].space)
+        self._slots[replace.pos].space = self._create_cartesian_rectangle(
+            Point(self._bottom_left_x_slot_position[replace.pos], (replace.height + 1) * Settings.width_of_slots),
+            Point(self._up_right_x_slot_position[replace.pos], self._up_right.y),
+            outline=Settings.ColorPalette.slot_space_default,
+            fill=Settings.ColorPalette.slot_space_default)
+
+        # replace head of slot
+        tk.Canvas.delete(self, self._slots[replace.pos].head)
+        self._slots[replace.pos].head = self._create_cartesian_rectangle(
+            Point(self._bottom_left_x_slot_position[replace.pos], replace.height * Settings.width_of_slots),
+            Point(self._up_right_x_slot_position[replace.pos], (replace.height + 1) * Settings.width_of_slots),
+            outline=Settings.ColorPalette.slot_head_default,
+            fill=Settings.ColorPalette.slot_head_default)
+
+        # replace body of slot
+        tk.Canvas.delete(self, self._slots[replace.pos].body)
+        self._slots[replace.pos].body = self._create_cartesian_rectangle(
+            Point(self._bottom_left_x_slot_position[replace.pos], self._bottom_left.y),
+            Point(self._up_right_x_slot_position[replace.pos], replace.height * Settings.width_of_slots),
+            outline=Settings.ColorPalette.slot_body_replace,
+            fill=Settings.ColorPalette.slot_body_replace)
+
+        # append slot to list of currently replaced slots
+        self._currently_replaced_slots.append(self._slots[replace.pos])
+
+    def unreplace_slots(self):
+        # colorize body of currently replaced slots
+        for slot in self._currently_replaced_slots:
+            self._colorize_slot_body(slot=slot, color=Settings.ColorPalette.slot_body_default)
+
+        # clear list of currently replaced slots
+        self._currently_replaced_slots.clear()
+
     def focus_slots(self, focus: SortingSteps.Focus) -> None:
         # clean slots
         self.clean_slots()
@@ -238,7 +287,6 @@ class Diagram(tk.Canvas):
     def _unswap_slots(self):
         # colorize space of current swap
         for slot in self._currently_swapped_slots:
-            self._colorize_slot_space(slot=slot, color=Settings.ColorPalette.slot_space_default)
             self._colorize_slot_space(slot=slot, color=Settings.ColorPalette.slot_space_default)
 
         # clear currently swapped slots

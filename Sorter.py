@@ -48,12 +48,26 @@ class Sorter:
         Sorter.steps.append(SortingSteps.Unmark(delay=delay))
 
     @staticmethod
+    def replace(data: np.ndarray, pos:int, height: int, delay: bool = True) -> None:
+        # replace entry in data
+        data[pos] = height
+
+        # append replace step to steps
+        Sorter.steps.append(SortingSteps.Replace(pos=pos, height=height, delay=delay))
+
+    @staticmethod
+    def unreplace(delay: bool = True) -> None:
+        # append unreplace step to steps
+        Sorter.steps.append(SortingSteps.Unreplace(delay=delay))
+
+
+    @staticmethod
     def focus(from_pos: int, to_pos: int, delay: bool = True) -> None:
         # append focus step to steps
         Sorter.steps.append(SortingSteps.Focus(from_pos=from_pos, to_pos=to_pos, delay=delay))
 
     @staticmethod
     def unfocus(delay: bool = True) -> None:
-        # append unmark step to steps
+        # append unfocus step to steps
         Sorter.steps.append(SortingSteps.Unfocus(delay=delay))
 

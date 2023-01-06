@@ -38,3 +38,12 @@ class Focus(Step):
 @dataclass
 class Unfocus(Step):
     pass
+
+@dataclass
+class Replace(Step):
+    pos: int
+    height: int
+
+@dataclass
+class Unreplace(Step):
+    pass

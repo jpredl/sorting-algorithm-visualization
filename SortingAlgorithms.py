@@ -64,15 +64,13 @@ class HeapSorter(Sorter):
                 # done, heap condition is satisfied
                 break
 
-
-
 class InsertionSorter(Sorter):
 
     def execute(self, data: np.ndarray) -> None:
         for i in range(1, len(data)):
             # insert data[i] at correct position in data[0], ..., data[i-1]
-            Sorter.mark(i, delay=False)
             Sorter.focus(0, i, delay=False)
+            Sorter.mark(i, delay=False)
             j = i
             while j > 0:
                 # if data[j - 1] > data[j]
@@ -306,4 +304,173 @@ class RandomQuickSorter(QuickSorter):
 
         # r is now position of random pivot element
         return r
+
+
+class MergeSorter(Sorter):
+
+    def __init__(self):
+
+        # temporary memory for merging
+        self._temp = []
+    def execute(self, data: np.ndarray) -> None:
+
+        # setup temporary memory for merging
+        self._temp = [0 for _ in data]
+
+        # apply the mergesort algorithm
+        self._mergesort(data, 0, len(data) - 1)
+
+    def _mergesort(self, data: np.ndarray, l: int, r: int) -> None:
+        if l < r:
+
+            Sorter.focus(l, r)
+            # divide data into two equal sized subarrays and proceed recursively
+            m = int((l + r) / 2)
+            self._mergesort(data, l, m)
+            self._mergesort(data, m + 1, r)
+
+            # merge the two (now) sorted subarrays
+            self.merge(data, l, m, r)
+
+    def merge(self, data: np.ndarray, l: int, m: int, r: int) -> None:
+
+        Sorter.focus(l, r, delay=False)
+
+        i = l
+        j = m + 1
+        k = l
+
+        while i <= m and j <= r:
+            # if data[i] < data[j]
+            if Sorter.compare(data, i, j):
+                self._temp[k] = data[i]
+                i += 1
+            else:
+                self._temp[k] = data[j]
+                j += 1
+            k += 1
+
+        if i > m:
+            for h in range(j, r + 1):
+                self._temp[k + h - j] = data[h]
+        else:
+            for h in range(i, m + 1):
+                self._temp[k + h - i] = data[h]
+
+        for i in range(l, r + 1):
+            Sorter.replace(data, i, self._temp[i])
+
+        Sorter.unreplace()
+
+
+class StraightMergeSorter(MergeSorter):
+
+    def execute(self, data: np.ndarray) -> None:
+
+        # setup temporary memory for merging
+        self._temp = [0 for _ in data]
+
+        # index of last entry
+        n = len(data) - 1
+
+        # index of left boundary of first subarray
+        l: int
+
+        # index of right boundary of first subarray
+        m: int
+
+        # index of right boundary of second subarray
+        r: int
+
+        # length of subarrays
+        s = 1
+
+        while s <= n:
+            # merge subarrays of length s
+            r = - 1
+            while r + s < n:
+                # while there are at least two subarrays
+                # determine boundaries of subarrays
+                l = r + 1
+                Sorter.mark(l)
+                m = l + s - 1
+                Sorter.mark(m, multiple=True)
+                if m + s <= n:
+                    # n has not been passed
+                    r = m + s
+                else:
+                    # in this case the second subarray is shorter than the first
+                    r = n
+                Sorter.mark(r, multiple=True)
+
+                # merge the two subarrays
+                Sorter.focus(l, r)
+                self.merge(data, l, m, r)
+
+            # in the next iteration merge subarrays of double length
+            s *= 2
+
+
+class NaturalMergeSorter(MergeSorter):
+
+    def execute(self, data: np.ndarray) -> None:
+
+        # setup temporary memory for merging
+        self._temp = [0 for _ in data]
+
+        # index of last entry
+        n = len(data) - 1
+
+        # index of left boundary of first run
+        l: int
+
+        # index of right boundary of first run
+        m: int
+
+        # index of right boundary of second run
+        r: int
+
+        while True:
+            r = -1
+            while r < n:
+                # while there are at least two runs
+                # determine the first run
+                l = r + 1
+                Sorter.mark(l)
+                m = l
+                while m < n:
+                    # if data[m] < data[m + 1]
+                    if Sorter.compare(data, m, m + 1):
+                        m += 1
+                    else:
+                        Sorter.mark(m, multiple=True)
+                        break
+
+                # determine the second run
+                if m < n:
+                    # there is a second run
+                    r = m + 1
+                    while r < n:
+                        # if data[r] < data[r + 1]
+                        if Sorter.compare(data, r, r + 1):
+                            r += 1
+                        else:
+                            Sorter.mark(r, multiple=True)
+                            break
+
+                    # merge the two runs
+                    Sorter.focus(l, r)
+                    self.merge(data, l, m, r)
+                    Sorter.unfocus()
+
+                else:
+                    # there is no second run
+                    r = n
+
+            if not l:
+                break
+
+
+
+
 

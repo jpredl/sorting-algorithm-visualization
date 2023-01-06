@@ -28,7 +28,10 @@ class Settings:
                          'Combsort': SortingAlgorithms.CombSorter(),
                          'Quicksort': SortingAlgorithms.QuickSorter(),
                          'Quicksort (Median)': SortingAlgorithms.MedianQuickSorter(),
-                         'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter()}
+                         'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter(),
+                         'Mergesort': SortingAlgorithms.MergeSorter(),
+                         'Mergesort (Straight)': SortingAlgorithms.StraightMergeSorter(),
+                         'Mergesort (Natural)': SortingAlgorithms.NaturalMergeSorter()}
 
     # size of data
     data_size: int = 50
@@ -156,11 +159,16 @@ class View(tk.Tk):
         self.label_swap_count = ttk.Label(master=self.frame_analysis, text='Swaps: 0')
         self.label_swap_count.grid(row=2, column=0, sticky='W')
 
+        # replace count label
+        self.label_replace_count = ttk.Label(master=self.frame_analysis, text='Replacements: 0')
+        self.label_replace_count.grid(row=3, column=0, sticky='W')
+
         # visualization worker
         self.visualization_worker = Worker.Worker(self.diagram,
                                                   callback_on_no_next_step_available=self._on_no_next_step_available,
                                                   callback_on_update_comparison_count=self._on_update_comparison_count,
                                                   callback_on_update_swap_count=self._on_update_swap_count,
+                                                  callback_on_update_replace_count=self._on_update_replace_count,
                                                   delay=Settings.Speed.speed_function(
                                                       self.scale_speed_current_value.get()))
 
@@ -232,3 +240,6 @@ class View(tk.Tk):
     def _on_update_comparison_count(self, count: int) -> None:
         # display comparison count in label
         self.label_comparison_count.config(text=f'Comparisons: {count}')
+    def _on_update_replace_count(self, count: int) -> None:
+        # display replace count in label
+        self.label_replace_count.config(text=f'Replacements: {count}')
