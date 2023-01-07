@@ -3,7 +3,7 @@
 Watch your favorite sorting algorithms do what they do best!
 
   <p align="center">
-    <img src="image/quicksort.gif" width="50%" alt="Visualization of Quicksort"/>
+    <img src="image/quicksort-permutation-cut.gif" width="50%" alt="Visualization of Quicksort"/>
   </p>
   <p align=center>
   Visualization of Quicksort
@@ -22,6 +22,14 @@ A simple application for the visualization and analysis of various sorting algor
 
 ## Run
 To run this application execute `main.py`. The only dependency is `numpy`.
+
+## Some Visualizations
+
+[Visualization of Natural Mergesort](images/natural-mergesort.html)
+
+[Visualization of Heapsort](images/natural-heapsort.html)
+
+[Visualization of Insertionsort](images/insertionsort.html)
 
 ## References
 
