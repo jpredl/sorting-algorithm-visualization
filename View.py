@@ -31,7 +31,9 @@ class Settings:
                          'Quicksort (Random)': SortingAlgorithms.RandomQuickSorter(),
                          'Mergesort': SortingAlgorithms.MergeSorter(),
                          'Mergesort (Straight)': SortingAlgorithms.StraightMergeSorter(),
-                         'Mergesort (Natural)': SortingAlgorithms.NaturalMergeSorter()}
+                         'Mergesort (Natural)': SortingAlgorithms.NaturalMergeSorter(),
+                         'Radixsort': SortingAlgorithms.DecimalRadixSorter(),
+                         'Radixsort (Binary)': SortingAlgorithms.BinaryRadixSorter()}
 
     # size of data
     data_size: int = 50

@@ -1,5 +1,6 @@
 import numpy as np
 
+import SortingSteps
 from Sorter import Sorter
 
 
@@ -469,6 +470,120 @@ class NaturalMergeSorter(MergeSorter):
 
             if not l:
                 break
+
+
+class RadixSorter(Sorter):
+
+    def __init__(self):
+        # length of representation
+        self._length = 0
+
+    def get_digit(self, index: int, representation: str) -> str:
+        return representation[self._length - index - 1]
+
+
+class BinaryRadixSorter(RadixSorter):
+
+    def execute(self, data: np.ndarray) -> None:
+        # generate binary representation of data
+        binary_data = self._binarize_data(data)
+
+        # sort the data using the radix exchange sort algorithm
+        self._binary_radix_sort(binary_data, 0, len(binary_data) - 1, self._length - 1)
+
+    def _binary_radix_sort(self, data: list[str], l: int, r: int, b: int) -> None:
+        if r > l:
+
+            # set focus to subarray data[l], ..., data[r]
+            Sorter.focus(l, r)
+
+            i = l - 1
+            j = r + 1
+
+            while True:
+
+                while True:
+                    i += 1
+                    if i >= j or self.get_digit(b, data[i]) == '1':
+                        break
+
+                while True:
+                    j -= 1
+                    if i >= j or self.get_digit(b, data[j]) == '0':
+                        break
+
+                if i >= j:
+                    break
+                else:
+                    Sorter.swap(data, i, j)
+
+            if b > 0:
+                self._binary_radix_sort(data, l, i - 1, b - 1)
+                self._binary_radix_sort(data, i, r, b - 1)
+
+
+    def _binarize_data(self, data: np.ndarray) -> list[str]:
+        # determine required length of binary representation
+        self._length = len(np.binary_repr(len(data)))
+
+        # return list of binary representations of equal length of data
+        return [np.binary_repr(d, self._length) for d in data]
+
+
+class DecimalRadixSorter(RadixSorter):
+
+    def __int__(self):
+        # temporary memory for data
+        self._temp: list[str] = []
+
+        # sizes of buckets
+        self._bucket_sizes: list[int] = []
+
+    def execute(self, data: np.ndarray) -> None:
+
+        representation = self._generate_representation(data)
+
+        self._radix_sort(representation)
+
+    def _radix_sort(self, data: list[str]) -> None:
+        n = len(data)
+        self._temp = [0 for _ in range(n)]
+        for b in range(self._length):
+
+            # determine bucket sizes
+            self._bucket_sizes = [0 for _ in range(10)]
+            for i in range(n):
+                j = int(self.get_digit(b, str(data[i])))
+                self._bucket_sizes[j] += 1
+
+            # set indices for buckets
+            self._bucket_sizes[9] = n - self._bucket_sizes[9]
+            for i in range(2,11):
+                self._bucket_sizes[10 - i] = self._bucket_sizes[11 - i] - self._bucket_sizes[10 - i]
+
+            # distribution phase
+            for i in range(n):
+                j = int(self.get_digit(b, str(data[i])))
+                self._temp[self._bucket_sizes[j]] = data[i]
+                self._bucket_sizes[j] += 1
+
+            # collection phase
+            for i in range(len(data)):
+                data[i] = self._temp[i]
+
+                # visualize replace
+                # (don't use Sorter.replace method as with radix sort we are not working on original data)
+                Sorter._steps.append(SortingSteps.Replace(pos=i, height=int(self._temp[i]), delay=True))
+
+    def _generate_representation(self, data: np.ndarray) -> list[str]:
+        # determine length of representation
+        self._length = len(str(len(data)))
+
+        # return list of representations of equal length of data
+        return [(self._length - len(str(d))) * '0' + str(d) for d in data]
+
+
+
 
 
 
