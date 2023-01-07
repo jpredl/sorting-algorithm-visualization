@@ -1,19 +1,25 @@
 import numpy as np
 
+import Initiator
+import Sorter
 import SortingSteps
+
 
 
 class Data:
 
-    def __init__(self, initialization_algorithm, sorting_algorithm, n):
+    def __init__(self, initiator: Initiator.Initiator, sorter: Sorter.Sorter, n):
         # initial data
-        self.initial_data: np.ndarray = initialization_algorithm(n)
+        self._initial_data: np.ndarray = initiator.initiate(n)
 
         # swaps
-        self._steps: list[SortingSteps.Step] = sorting_algorithm(self.initial_data.copy())
+        self._steps: list[SortingSteps.Step] = sorter.sort(self._initial_data.copy())
 
         # index for iterating swaps
         self._index: int = -1
+
+    def get_initial_data(self) -> np.ndarray:
+        return self._initial_data
 
     def get_next_step(self) -> SortingSteps.Step:
         if self.next_step_available():
