@@ -31,8 +31,6 @@ To run this application execute `main.py`. The only dependency is `numpy`.
 
 [Visualization of Insertionsort](images/insertionsort-local.md)
 
-[Visualization of Median Quicksort](images/median-quicksort-permutation.md)
-
 ## References
 
 T. Ottmann and P. Widmayer. *Algorithmen und Datenstrukturen*. Spektrum Akad. Verl., 1996
