@@ -2,12 +2,12 @@
 
 Watch your favorite sorting algorithms do what they do best!
 
-  <p align="center">
-    <img src="image/quicksort-permutation-cut.gif" width="50%" alt="Visualization of Quicksort"/>
+<p align="center">
+    <img src="images/quicksort-permutation.gif" width="50%" alt="Visualization of Quicksort"/>
   </p>
   <p align=center>
   Visualization of Quicksort
-  </p>
+</p>
 
 ## About
 A simple application for the visualization and analysis of various sorting algorithms. Written in python and using the Tkinter library.
@@ -25,11 +25,13 @@ To run this application execute `main.py`. The only dependency is `numpy`.
 
 ## Some Visualizations
 
-[Visualization of Natural Mergesort](images/natural-mergesort.html)
+<a href="images/natural-mergesort-permutation.gif>Visualization of Natural Mergesort</a>
 
-[Visualization of Heapsort](images/natural-heapsort.html)
+<a href="images/heapsort-sorted.gif>Visualization of Heapsort</a>
 
-[Visualization of Insertionsort](images/insertionsort.html)
+<a href="images/insertionsort-local.gif>Visualization of Natural Insertionsort</a>
+
+<a href="images/median-quicksort-permutation.gif>Visualization of Median Quicksort</a>
 
 ## References
 

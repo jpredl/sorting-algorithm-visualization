@@ -36,7 +36,7 @@ class Settings:
         slot_head_default: str = 'black'
         slot_body_default: str = 'sky blue'
         slot_body_mark: str = 'indian red'
-        slot_body_replace: str = 'dark slate blue'
+        slot_body_replace: str = 'MediumPurple4'
         focus_rectangle: str = 'gainsboro'
 
 
@@ -272,6 +272,9 @@ class Diagram(tk.Canvas):
 
         # unmark slots
         self.unmark_slots()
+
+        # unreplace slots
+        self.unreplace_slots()
 
         # unfocus slots
         self.unfocus_slots()
