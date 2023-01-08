@@ -25,13 +25,13 @@ To run this application execute `main.py`. The only dependency is `numpy`.
 
 ## Some Visualizations
 
-<a href="images/natural-mergesort-permutation.gif>Visualization of Natural Mergesort</a>
+[Visualization of Natural Mergesort](images/natural-mergesort-permutation.md)
 
-<a href="images/heapsort-sorted.gif>Visualization of Heapsort</a>
+[Visualization of Heapsort](images/heapsort-sorted.md)
 
-<a href="images/insertionsort-local.gif>Visualization of Natural Insertionsort</a>
+[Visualization of Insertionsort](images/insertionsort-local.md)
 
-<a href="images/median-quicksort-permutation.gif>Visualization of Median Quicksort</a>
+[Visualization of Median Quicksort](images/median-quicksort-permutation.md)
 
 ## References
 
