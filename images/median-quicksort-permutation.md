@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="images/median-quicksort-permutation.gif" width="60%" alt="Visualization of Median Quicksort"/>
+    <img src="median-quicksort-permutation.gif" width="60%" alt="Visualization of Median Quicksort"/>
   </p>
   <p align=center>
   Visualization of Median Quicksort
