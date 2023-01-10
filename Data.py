@@ -7,6 +7,9 @@ import SortingSteps
 
 
 class Data:
+    """
+    Data structure for the data that will be sorted and the steps of the sorting process.
+    """
 
     def __init__(self, initiator: Initiator.Initiator, sorter: Sorter.Sorter, n):
         # initial data

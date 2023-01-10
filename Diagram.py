@@ -8,23 +8,45 @@ import SortingSteps
 
 @dataclass
 class Settings:
+    """
+    Settings for Diagram.
 
-    # width of slots
+    ...
+
+    Attributes
+    ----------
+    width_of_slots: int
+        Width of a slot.
+
+    separation_between_slots: int
+        Separation between slots.
+
+    horizontal_margin_left: int
+        Horizontal margin from the left border of the canvas to the first slot.
+
+    horizontal_margin_right: int
+        Horizontal margin from the right border of the canvas to the last slot.
+
+    vertical_margin_top: int
+        Vertical margin from the top border of the canvas to top of the sloots.
+
+    vertical_margin_bottom: int
+        Vertical margin from the bottom border of the canvas to the base of the slots.
+
+    ColorPalette
+        Colors for various parts of the Diagram.
+    """
+
     width_of_slots: int = 8
 
-    # separation between slots
     separation_between_slots: int = 3
 
-    # horizontal margin left
     horizontal_margin_left: int = 2
 
-    # horizontal margin right
     horizontal_margin_right: int = 2
 
-    # vertical margin top
     vertical_margin_top: int = 2
 
-    # vertical margin bottom
     vertical_margin_bottom: int = 2
 
     @dataclass
@@ -40,17 +62,26 @@ class Settings:
         focus_rectangle: str = 'gainsboro'
 
 
-Point = namedtuple('Point', 'x y')
 
+# Point holding x and y coordinates.
+Point = namedtuple('Point', 'x y')
 
 @dataclass
 class DiagramSlot:
+    """
+    A bar in the Diagram and its space above it. The bar is made up of a body at the bottom and a head separating
+    body and space. Space, head and body are all rectangles on the canvas.
+    """
+
     space = None
     head = None
     body = None
 
 
 class Diagram(tk.Canvas):
+    """
+    Visualizes the bars that will be sorted and provides methods for visualizing the steps in the sorting process.
+    """
 
     def __init__(self, master: tk.Widget, n: int):
         # number of slots

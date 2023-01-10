@@ -4,6 +4,17 @@ import SortingSteps
 
 
 class Sorter:
+    """
+    Base class for a sorting algorithm.
+
+    Methods
+    -------
+    sort(data)
+        Wrapper for sorting data. Returns list of steps of sorting processes.
+    execute(data)
+        This method should be overridden by the concrete sorting algorithm.
+    """
+
     _steps = []
 
     def sort(self, data: np.ndarray) -> list[SortingSteps.Step]:

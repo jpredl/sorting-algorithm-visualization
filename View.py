@@ -3,6 +3,8 @@ import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 
+import time
+
 import Data
 import Diagram
 import Initiator
@@ -11,14 +13,33 @@ import Worker
 
 @dataclass
 class Settings:
-    # algorithms for initializing the data
+    '''
+    Settings for View.
+
+    ...
+
+    Attributes
+    ----------
+    InitializationAlgorithms: dict[str, Initiator.Initiator]
+        Name and a class instance of an initiator used for initializing the array that should be sorted.
+
+    SortingAlgorithms: dict[str, Sorter.Sorter]
+        Name and a class instance of a sorting algorithm.
+
+    data_size: int
+        Size of the array that should be sorted.
+
+    speed
+        Settings for the speed of the visualization and the associated scale widget.
+
+    '''
+
     InitializationAlgorithms = {'Permutation': Initiator.PermutationInitiator(),
                                 'Local': Initiator.LocalInitiator(),
                                 'Transposition': Initiator.TranspositionInitiater(),
                                 'Reverse': Initiator.ReverseInitiator(),
                                 'Sorted': Initiator.SortedInitiator()}
 
-    # algorithms for sorting the data
     SortingAlgorithms = {'Selectionsort': SortingAlgorithms.SelectionSorter(),
                          'Heapsort': SortingAlgorithms.HeapSorter(),
                          'Insertionsort': SortingAlgorithms.InsertionSorter(),
@@ -35,10 +56,8 @@ class Settings:
                          'Radixsort': SortingAlgorithms.DecimalRadixSorter(),
                          'Radixsort (Binary)': SortingAlgorithms.BinaryRadixSorter()}
 
-    # size of data
     data_size: int = 50
 
-    # settings for visualization speed
     @dataclass
     class Speed:
         scale_speed_from: int = 0
@@ -48,6 +67,9 @@ class Settings:
 
 
 class View(tk.Tk):
+    '''
+    Main window that holds all widgets and manages the control flow.
+    '''
 
     def __init__(self, *args, **kwargs):
         # initiate Tk window
@@ -206,6 +228,8 @@ class View(tk.Tk):
         self.button_start_resume.config(state='disabled')
         self.button_pause.config(state='normal')
         self.button_next_step.config(state='disabled')
+
+        time.sleep(3)
 
         # start visualization
         self.visualization_worker.start_visualization()

@@ -444,8 +444,8 @@ class NaturalMergeSorter(MergeSorter):
                     if Sorter.compare(data, m, m + 1):
                         m += 1
                     else:
-                        Sorter.mark(m, multiple=True)
                         break
+                Sorter.mark(m, multiple=True)
 
                 # determine the second run
                 if m < n:
@@ -456,8 +456,8 @@ class NaturalMergeSorter(MergeSorter):
                         if Sorter.compare(data, r, r + 1):
                             r += 1
                         else:
-                            Sorter.mark(r, multiple=True)
                             break
+                    Sorter.mark(r, multiple=True)
 
                     # merge the two runs
                     Sorter.focus(l, r)

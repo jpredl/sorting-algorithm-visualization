@@ -2,9 +2,24 @@ import numpy as np
 
 
 class Initiator:
+    """
+    Base class for initiating the array that will be sorted.
+    """
 
     @staticmethod
     def initiate(n: int) -> np.ndarray:
+        """
+
+        Parameters
+        ----------
+        n: int
+            Size of array that will be initiated.
+
+        Returns
+        -------
+        np.ndarray
+            Array that will be sorted.
+        """
         pass
 
 
