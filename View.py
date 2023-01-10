@@ -3,8 +3,6 @@ import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 
-import time
-
 import Data
 import Diagram
 import Initiator
@@ -228,8 +226,6 @@ class View(tk.Tk):
         self.button_start_resume.config(state='disabled')
         self.button_pause.config(state='normal')
         self.button_next_step.config(state='disabled')
-
-        time.sleep(3)
 
         # start visualization
         self.visualization_worker.start_visualization()
